@@ -1,4 +1,5 @@
 ---
+import { ANIMATION_NAMES } from '@/lib/pixbar/animations/names'
 import { display } from '@/lib/server/display'
 import { statusText } from '@/lib/status-text'
 
@@ -23,9 +24,13 @@ const text = statusText(status)
       </p>
 
       <div class="controls">
-        <button type="button" id="start">
-          Start unicorn
-        </button>
+        {ANIMATION_NAMES.map((name) => (
+          <button type="button" data-animation={name}>
+            {name}
+          </button>
+        ))}
+      </div>
+      <div class="controls">
         <button type="button" id="stop">
           Stop
         </button>
@@ -47,6 +52,7 @@ const text = statusText(status)
 
 <script>
   import { actions } from 'astro:actions'
+  import { isAnimationName } from '@/lib/pixbar/animations/names'
   import type { DisplayStatus } from '@/lib/server/display'
   import { statusText } from '@/lib/status-text'
 
@@ -58,8 +64,16 @@ const text = statusText(status)
     }
   }
 
-  function bind(id: string, action: typeof actions.stop) {
-    const button = document.querySelector<HTMLButtonElement>(`#${id}`)!
+  /**
+   * What every action call resolves to. Astro's own types differ per action
+   * (`play` takes input), so the shared shape is spelled out here.
+   */
+  type Command = () => Promise<{
+    data?: DisplayStatus
+    error?: { message: string }
+  }>
+
+  function bind(button: HTMLButtonElement, action: Command) {
     button.addEventListener('click', async () => {
       button.disabled = true
       try {
@@ -76,9 +90,15 @@ const text = statusText(status)
     })
   }
 
-  bind('start', actions.startUnicorn)
-  bind('stop', actions.stop)
-  bind('clear', actions.clear)
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    'button[data-animation]',
+  )) {
+    const animation = button.dataset.animation
+    if (isAnimationName(animation))
+      bind(button, () => actions.play({ animation }))
+  }
+  bind(document.querySelector('#stop')!, () => actions.stop())
+  bind(document.querySelector('#clear')!, () => actions.clear())
 </script>
 
 <style>
@@ -106,6 +126,12 @@ const text = statusText(status)
     gap: 0.5rem;
     flex-wrap: wrap;
     margin: 1.5rem 0;
+  }
+  [data-animation] {
+    text-transform: capitalize;
+  }
+  .controls + .controls {
+    margin-top: -0.75rem;
   }
   button {
     font: inherit;

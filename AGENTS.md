@@ -8,7 +8,7 @@ Capybara is a Bun + TypeScript + Astro app for driving an **Ulanzi TC002 PixBar*
 - **Device insight**: status, what's currently showing, live previews of frames we send.
 - **Integrations**: scheduled/configurable apps fed by external APIs (social stats, weather, …) that render frames and push them to the clock.
 
-So far: the MQTT broker and client, display helpers, the unicorn animation, and a proof-of-concept page (`/`) that starts and stops the unicorn and clears the screen.
+So far: the MQTT broker and client, display helpers, three animations (unicorn, dinosaur, capybara), and a proof-of-concept page (`/`) that plays and stops them and clears the screen.
 
 ### Principles
 
@@ -47,7 +47,7 @@ So far: the MQTT broker and client, display helpers, the unicorn animation, and 
 - `src/lib/pixbar/http.ts`: calls to the clock's HTTP API (`removeCustomApp`); failures throw `ClockError`, which actions turn into a `BAD_GATEWAY` message.
 - `src/lib/pixbar/stream.ts`: `streamApp` streams any `Animation` (`{ next(): CustomAppFrame }`) into a custom app: first frame, then `switchDiyApp`, then a timer. The server (`Display.play`) and `scripts/unicorn.ts` both use it, so new animations need no streaming code of their own.
 - `src/lib/status-text.ts`: status formatting shared by the page's server render and its client script.
-- `src/lib/pixbar/animations/`: frame generators (e.g. `unicorn.ts`).
+- `src/lib/pixbar/animations/`: frame generators (`unicorn.ts`, `dinosaur.ts`, `capybara.ts`), the shared `drawSprite` helper (`sprite.ts`: sprites as rows of palette characters, `.` transparent), the registry `ANIMATIONS` (`index.ts`), and `names.ts` (names only, so the browser can import them without rendering code). To add an animation: write `createX()` returning `{ next(): CustomAppFrame }`, add it to `names.ts` and `index.ts`. The page renders a button per name, and the `play` action validates the name.
 - `src/lib/server/display.ts`: the server-side display controller (see above).
 - `src/integrations/pixbar.ts`, `src/actions/index.ts`, `src/pages/index.astro`: dev startup hook, actions, and the UI.
 - `scripts/`: CLI entry points. `server.ts` is the production entry. `bun run broker` runs a standalone broker. `bun run unicorn [--serve]` streams the unicorn without Astro (`--serve` embeds the broker).

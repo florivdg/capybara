@@ -19,16 +19,12 @@
     "enabled": true,
   },
 
-  // Astro infers the `server` actions object's type from each handler, and
-  // fallow reads the imported DisplayStatus in it as a same-file private type.
-  // It is exported from src/lib/server/display.ts; inline suppression doesn't
-  // apply to this rule, so it is off for this one file.
-  "overrides": [
-    {
-      "files": ["src/actions/index.ts"],
-      "rules": { "private-type-leaks": "off" },
-    },
-  ],
+  // private-type-leaks reports exported signatures that use *imported* types
+  // (e.g. `CustomAppFrame` from ./display, `DisplayStatus` in the actions) as
+  // if those types were private to the file. Every finding so far was that
+  // false positive, so the rule is off rather than worked around per file.
+  // TODO: turn it back on once fallow resolves imported types correctly.
+  "rules": { "private-type-leaks": "off" },
 
   "audit": {
     "gate": "all",

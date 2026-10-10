@@ -1,4 +1,5 @@
 import { Canvas, WIDTH, dim, type CustomAppFrame } from '../display'
+import { drawSprite, mirror, withLegs } from './sprite'
 
 // Facing right. Letters are palette keys; 1-5 are the mane/tail rainbow
 // slots, which cycle colours every frame.
@@ -18,7 +19,7 @@ const LEGS = [
   ['....WW....WW....', '....GG....GG....'],
   ['...W..W..W..W...', '..G....GG....G..'],
 ]
-const PALETTE: Record<string, number> = {
+const PALETTE: Partial<Record<string, number>> = {
   W: 0xffffff,
   G: 0x808080,
   Y: 0xffd700,
@@ -36,13 +37,8 @@ interface Sparkle {
   life: number
 }
 
-const mirror = (rows: string[]) =>
-  rows.map((row) => row.split('').toReversed().join(''))
 /** Built once: `SPRITES[facingRight ? 0 : 1][legFrame]`. */
-const SPRITES = [
-  LEGS.map((legs) => [...BODY, ...legs]),
-  LEGS.map((legs) => mirror([...BODY, ...legs])),
-]
+const SPRITES = [withLegs(BODY, LEGS), withLegs(BODY, LEGS).map(mirror)]
 
 const sprite = (t: number, facingRight: boolean): string[] =>
   SPRITES[facingRight ? 0 : 1][t % 2]
@@ -58,15 +54,11 @@ function render(
     canvas.set(s.x, s.y, dim(s.color, s.life / SPARKLE_LIFE))
 
   const y0 = t % 2 ? 3 : 2 // bob while galloping
-  sprite(t, facingRight).forEach((row, dy) => {
-    row.split('').forEach((ch, dx) => {
-      if (ch === '.') return
-      const color = /\d/.test(ch)
-        ? RAINBOW[(Number(ch) + t) % RAINBOW.length]
-        : PALETTE[ch]
-      canvas.set(x + dx, y0 + dy, color)
-    })
-  })
+  drawSprite(canvas, sprite(t, facingRight), x, y0, (ch) =>
+    ch >= '0' && ch <= '9'
+      ? RAINBOW[(Number(ch) + t) % RAINBOW.length]
+      : PALETTE[ch],
+  )
   return canvas
 }
 
@@ -95,11 +87,7 @@ export function createUnicorn({
       })
       for (const s of sparkles) s.life--
       sparkles = sparkles.filter((s) => s.life > 0)
-
-      const frame: CustomAppFrame = {
-        duration: 5,
-        draw: [render(t, x, direction > 0, sparkles).toBitmap()],
-      }
+      const frame = render(t, x, direction > 0, sparkles).toFrame()
 
       x += direction
       // Turn around once fully off-screen, so it re-enters facing the other way.

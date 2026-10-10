@@ -60,6 +60,9 @@ export function switchAppTopic(prefix: string): string {
   return `${prefix}/switchDiyApp`
 }
 
+/** Seconds a streamed frame stays up once no newer one follows. */
+export const FRAME_DURATION = 5
+
 /** A frame buffer you draw into, then send as one `db` bitmap. */
 export class Canvas {
   readonly pixels: number[] = Array.from({ length: WIDTH * HEIGHT }, () => 0)
@@ -72,6 +75,15 @@ export class Canvas {
 
   toBitmap(): DrawCommand {
     return { db: [0, 0, WIDTH, HEIGHT, this.pixels] }
+  }
+
+  /**
+   * The whole canvas as one frame. Animations stream a new frame several times
+   * a second; `duration` only matters if they stop, as how long the last
+   * frame stays up.
+   */
+  toFrame(): CustomAppFrame {
+    return { duration: FRAME_DURATION, draw: [this.toBitmap()] }
   }
 }
 

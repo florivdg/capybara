@@ -4,13 +4,13 @@ A local control app for the **Ulanzi TC002 PixBar**, a 52×16 RGB pixel clock, b
 
 Capybara runs its own MQTT broker. Point the clock at it, and the app can push content to the clock's display: animations, and later text, drawings and data from other services.
 
-> **Status: early proof of concept.** It can stream an animation (a galloping unicorn) to the clock, stop it, and clear it again from a small web page. Everything else below under [Roadmap](#roadmap) is planned, not built.
+> **Status: early proof of concept.** It can stream one of three animations (a unicorn, a dinosaur and a capybara) to the clock, stop it, and clear it again from a small web page. Everything else below under [Roadmap](#roadmap) is planned, not built.
 
 ## What works today
 
 - **Built-in MQTT broker** written in TypeScript on Bun's TCP sockets. No mosquitto or MQTT library needed; it starts together with the web server.
 - **Web page** at `/` with three buttons:
-  - **Start unicorn**: streams the animation at 8 fps and brings it to the front of the clock.
+  - **Unicorn**, **Dinosaur**, **Capybara**: stream that animation at 8 fps and bring it to the front of the clock. The unicorn gallops back and forth, the dinosaur jumps over cacti, and the capybara wanders across with an orange on its head, stopping halfway to chill.
   - **Stop**: stops streaming. The last frame stays up briefly.
   - **Clear screen**: removes Capybara's app from the clock, so it goes back to its own apps.
 - **Reconnects**: if the clock drops off Wi-Fi and comes back, a running animation is brought to the front again automatically.
@@ -38,7 +38,7 @@ Capybara runs its own MQTT broker. Point the clock at it, and the app can push c
 
 3. In the clock's MQTT settings, set the broker to **this machine's LAN IP** and port **1883** (no username or password).
 
-4. Open http://localhost:4321. Once the clock has connected, it appears under **MQTT clients** (as `ulanzi_xxxx`). Press **Start unicorn**.
+4. Open http://localhost:4321. Once the clock has connected, it appears under **MQTT clients** (as `ulanzi_xxxx`). Press one of the animation buttons.
 
 ### Configuration
 

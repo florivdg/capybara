@@ -1,20 +1,7 @@
 import { expect, test } from 'bun:test'
-import { HEIGHT, WIDTH, type CustomAppFrame } from '../display'
+import { WIDTH } from '../display'
+import { bitmap } from './testing'
 import { SPRITE_WIDTH, createUnicorn } from './unicorn'
-
-function bitmap(frame: CustomAppFrame) {
-  const cmd = frame.draw?.[0]
-  if (!cmd || !('db' in cmd)) throw new Error('expected a db bitmap')
-  return cmd.db
-}
-
-test('emits full-screen bitmap frames', () => {
-  const frame = createUnicorn().next()
-  expect(frame.duration).toBe(5)
-  const [x, y, w, h, pixels] = bitmap(frame)
-  expect([x, y, w, h]).toEqual([0, 0, WIDTH, HEIGHT])
-  expect(pixels).toHaveLength(WIDTH * HEIGHT)
-})
 
 test('gallops across, turns around, and comes back', () => {
   const unicorn = createUnicorn({ random: () => 0 })
