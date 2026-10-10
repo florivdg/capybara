@@ -87,6 +87,13 @@ export class Canvas {
   }
 }
 
+/** The `db` bitmap of a full-screen frame: `[x, y, width, height, pixels]`. */
+export function frameBitmap(frame: CustomAppFrame) {
+  const cmd = frame.draw?.[0]
+  if (!cmd || !('db' in cmd)) throw new Error('expected a db bitmap')
+  return cmd.db
+}
+
 /** Scales each RGB channel of a 0xRRGGBB color by `factor` (0–1). */
 export function dim(color: number, factor: number): number {
   const channel = (shift: number) =>

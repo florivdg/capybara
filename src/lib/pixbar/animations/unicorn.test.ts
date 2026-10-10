@@ -1,12 +1,11 @@
 import { expect, test } from 'bun:test'
-import { WIDTH } from '../display'
-import { bitmap } from './testing'
+import { WIDTH, frameBitmap } from '../display'
 import { SPRITE_WIDTH, createUnicorn } from './unicorn'
 
 test('gallops across, turns around, and comes back', () => {
   const unicorn = createUnicorn({ random: () => 0 })
   const lit = (n: number) => {
-    const pixels = bitmap(unicorn.next())[4]
+    const pixels = frameBitmap(unicorn.next())[4]
     return pixels.some((color, i) => i % WIDTH === n && color !== 0)
   }
   // Starts fully off-screen left, reaches the right edge after one crossing.

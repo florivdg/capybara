@@ -1,0 +1,32 @@
+---
+interface Props {
+  /** Rows of the icon; `#` is a filled pixel. */
+  rows: string[]
+}
+
+const { rows } = Astro.props
+---
+
+<svg
+  class="pixel-icon"
+  viewBox={`0 0 ${rows[0].length} ${rows.length}`}
+  aria-hidden="true"
+  focusable="false"
+>
+  {rows.flatMap((row, y) =>
+    row
+      .split('')
+      .flatMap((ch, x) =>
+        ch === '#' ? [<rect x={x} y={y} width="1" height="1" />] : [],
+      ),
+  )}
+</svg>
+
+<style>
+  .pixel-icon {
+    width: 1.1em;
+    height: 1.1em;
+    fill: currentColor;
+    shape-rendering: crispEdges;
+  }
+</style>

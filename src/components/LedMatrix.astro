@@ -1,0 +1,48 @@
+---
+import { HEIGHT, WIDTH } from '@/lib/pixbar/display'
+
+interface Props {
+  /** WIDTH × HEIGHT 0xRRGGBB colors, row-major; 0 is an unlit LED. */
+  pixels: number[]
+}
+
+const { pixels } = Astro.props
+const hex = (color: number) => `#${color.toString(16).padStart(6, '0')}`
+// Unlit LEDs are one repeating pattern; only lit ones become elements.
+const unlit = `led-off-${crypto.randomUUID()}`
+const lit = pixels.flatMap((color, i) =>
+  color
+    ? [{ x: (i % WIDTH) + 0.5, y: Math.floor(i / WIDTH) + 0.5, color }]
+    : [],
+)
+---
+
+<svg
+  class="led-matrix"
+  viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <pattern id={unlit} width="1" height="1" patternUnits="userSpaceOnUse">
+      <circle
+        cx="0.5"
+        cy="0.5"
+        r="0.42"
+        fill="var(--led-off, #222a4d)"
+      ></circle>
+    </pattern>
+  </defs>
+  <rect width={WIDTH} height={HEIGHT} fill={`url(#${unlit})`}></rect>
+  {lit.map(({ x, y, color }) => (
+    <circle cx={x} cy={y} r="0.42" fill={hex(color)} />
+  ))}
+</svg>
+
+<style>
+  .led-matrix {
+    display: block;
+    width: 100%;
+    background: var(--matrix, #0b0e1f);
+  }
+</style>

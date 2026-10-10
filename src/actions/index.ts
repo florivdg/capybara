@@ -25,7 +25,7 @@ export const server = {
   play: defineAction({
     input: z.object({ animation: z.enum(ANIMATION_NAMES) }),
     handler: ({ animation }) =>
-      respond((d) => d.play(animation, ANIMATIONS[animation]())),
+      respond((d) => d.play(animation, ANIMATIONS[animation].create())),
   }),
   stop: command((d) => d.stop()),
   clear: command((d) => d.clear()),

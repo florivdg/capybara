@@ -1,8 +1,7 @@
 import { expect, test } from 'bun:test'
-import { FRAME_DURATION, HEIGHT, WIDTH } from '../display'
+import { FRAME_DURATION, HEIGHT, WIDTH, frameBitmap } from '../display'
 import { ANIMATIONS } from '.'
 import { DINO_COLOR, createDinosaur } from './dinosaur'
-import { bitmap } from './testing'
 
 /** A seeded generator, so a failure replays the same way. */
 function seeded(seed: number) {
@@ -14,12 +13,12 @@ function seeded(seed: number) {
 
 test.each(Object.entries(ANIMATIONS))(
   '%s emits full-screen bitmap frames',
-  (_name, create) => {
+  (_name, { create }) => {
     const animation = create()
     for (let i = 0; i < 300; i++) {
       const frame = animation.next()
       expect(frame.duration).toBe(FRAME_DURATION)
-      const [x, y, w, h, pixels] = bitmap(frame)
+      const [x, y, w, h, pixels] = frameBitmap(frame)
       expect([x, y, w, h]).toEqual([0, 0, WIDTH, HEIGHT])
       expect(pixels).toHaveLength(WIDTH * HEIGHT)
     }
@@ -29,7 +28,7 @@ test.each(Object.entries(ANIMATIONS))(
 test('the dinosaur clears every cactus', () => {
   const dinosaur = createDinosaur({ random: seeded(42) })
   const shown = () =>
-    bitmap(dinosaur.next())[4].filter((c) => c === DINO_COLOR).length
+    frameBitmap(dinosaur.next())[4].filter((c) => c === DINO_COLOR).length
   // The first cactus starts off-screen, so frame 0 shows the whole dinosaur.
   // Cacti are drawn over it, so any overlap later hides some of its pixels.
   const whole = shown()

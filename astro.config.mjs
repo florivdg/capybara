@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config'
+import { defineConfig, fontProviders } from 'astro/config'
 
 import node from '@astrojs/node'
 
@@ -11,4 +11,16 @@ export default defineConfig({
   // Runs on Bun, not Node: the MQTT broker uses Bun's TCP sockets.
   adapter: node({ mode: 'standalone' }),
   integrations: [pixbar()],
+
+  // Downloaded at build time and served from the app itself
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: 'Pixelify Sans',
+      cssVariable: '--font-pixel',
+      // A variable font: one file covers the whole range
+      weights: ['400 700'],
+      styles: ['normal'],
+    },
+  ],
 })
