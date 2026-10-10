@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/fallow/schema.json",
+
+  // Pages and astro.config come from fallow's astro plugin. The CLI scripts
+  // are run directly by `bun run broker` / `bun run unicorn`, so nothing
+  // imports them.
+  "entry": ["scripts/*.ts"],
+
+  // scripts/server.ts imports the built server, which only exists after
+  // `bun run build`.
+  "ignoreUnresolvedImports": ["../dist/server/entry.mjs"],
+
+  // Only imported by astro.config.mjs, which fallow treats as non-production.
+  "ignoreDependencies": ["astro", "@astrojs/node"],
+
+  // Resolves members through inferred types (e.g. `await MqttClient.connect()`),
+  // which the syntactic pass reports as unused class members.
+  "typeAware": {
+    "enabled": true,
+  },
+
+  // Astro infers the `server` actions object's type from each handler, and
+  // fallow reads the imported DisplayStatus in it as a same-file private type.
+  // It is exported from src/lib/server/display.ts; inline suppression doesn't
+  // apply to this rule, so it is off for this one file.
+  "overrides": [
+    {
+      "files": ["src/actions/index.ts"],
+      "rules": { "private-type-leaks": "off" },
+    },
+  ],
+
+  "audit": {
+    "gate": "all",
+  },
+}

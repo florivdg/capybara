@@ -1,16 +1,139 @@
 ---
+import { display } from '@/lib/server/display'
+import { statusText } from '@/lib/status-text'
+
+const status = display().status()
+const text = statusText(status)
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Capybara · PixBar</title>
+  </head>
+  <body>
+    <main>
+      <h1>Capybara</h1>
+      <p class="topic">
+        Publishing to <code>{status.topic}</code>
+      </p>
+
+      <div class="controls">
+        <button type="button" id="start">
+          Start unicorn
+        </button>
+        <button type="button" id="stop">
+          Stop
+        </button>
+        <button type="button" id="clear">
+          Clear screen
+        </button>
+      </div>
+
+      <dl>
+        <dt>Animation</dt>
+        <dd data-status="animation">{text.animation}</dd>
+        <dt>MQTT clients</dt>
+        <dd data-status="clients">{text.clients}</dd>
+      </dl>
+      <p class="error" role="alert"></p>
+    </main>
+  </body>
 </html>
+
+<script>
+  import { actions } from 'astro:actions'
+  import type { DisplayStatus } from '@/lib/server/display'
+  import { statusText } from '@/lib/status-text'
+
+  const errorBox = document.querySelector('.error')!
+
+  function render(status: DisplayStatus) {
+    for (const [name, value] of Object.entries(statusText(status))) {
+      document.querySelector(`[data-status="${name}"]`)!.textContent = value
+    }
+  }
+
+  function bind(id: string, action: typeof actions.stop) {
+    const button = document.querySelector<HTMLButtonElement>(`#${id}`)!
+    button.addEventListener('click', async () => {
+      button.disabled = true
+      try {
+        const { data, error } = await action()
+        errorBox.textContent = error ? error.message : ''
+        // A failed command may still have changed state (clear stops the stream first).
+        const status = data ?? (await actions.status()).data
+        if (status) render(status)
+      } catch (error) {
+        errorBox.textContent = `Couldn't reach the server: ${error instanceof Error ? error.message : String(error)}`
+      } finally {
+        button.disabled = false
+      }
+    })
+  }
+
+  bind('start', actions.startUnicorn)
+  bind('stop', actions.stop)
+  bind('clear', actions.clear)
+</script>
+
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    font-family: system-ui, sans-serif;
+    background: #111;
+    color: #eee;
+  }
+  main {
+    width: min(32rem, 90vw);
+  }
+  h1 {
+    margin-bottom: 0.25rem;
+  }
+  .topic {
+    margin-top: 0;
+    color: #999;
+  }
+  .controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+  }
+  button {
+    font: inherit;
+    padding: 0.6rem 1rem;
+    border: 1px solid #444;
+    border-radius: 0.5rem;
+    background: #222;
+    color: inherit;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) {
+    border-color: #3ee08a;
+  }
+  button:disabled {
+    opacity: 0.5;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 1rem;
+  }
+  dt {
+    color: #999;
+  }
+  dd {
+    margin: 0;
+  }
+  .error {
+    color: #ff6b6b;
+  }
+</style>

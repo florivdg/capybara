@@ -1,5 +1,12 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "compilerOptions": {
+    // The MQTT broker/client and scripts run on Bun; tests use `bun test`
+    "types": ["bun"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
 }

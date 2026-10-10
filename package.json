@@ -3,15 +3,40 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.12.0"
+    "bun": ">=1.4.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "bunx --bun astro dev",
+    "build": "bunx --bun astro build",
+    "start": "bun scripts/server.ts",
+    "preview": "bun run build && bun run start",
+    "astro": "bunx --bun astro",
+    "broker": "bun scripts/broker.ts",
+    "unicorn": "bun scripts/unicorn.ts",
+    "test": "bun test",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "bunx --bun astro check",
+    "check": "bun run lint && bun run typecheck && bun run format:check && bun run test",
+    "fallow": "fallow audit",
+    "fallow:dead": "fallow dead-code",
+    "fallow:dupes": "fallow dupes",
+    "fallow:health": "fallow health"
   },
   "dependencies": {
+    "@astrojs/node": "^11.1.7",
     "astro": "^7.3.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/bun": "^1.4.2",
+    "fallow": "^3.33.1",
+    "oxlint": "^1.87.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "typescript": "6"
   }
 }
