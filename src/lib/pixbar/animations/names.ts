@@ -2,7 +2,12 @@
  * Animation names, kept apart from the animations themselves so the browser
  * can use them without bundling any rendering code.
  */
-export const ANIMATION_NAMES = ['unicorn', 'dinosaur', 'capybara'] as const
+export const ANIMATION_NAMES = [
+  'unicorn',
+  'dinosaur',
+  'capybara',
+  'clawd',
+] as const
 
 export type AnimationName = (typeof ANIMATION_NAMES)[number]
 

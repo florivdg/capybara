@@ -1,5 +1,6 @@
 import type { Animation } from '../stream'
 import { createCapybara } from './capybara'
+import { createClawd } from './clawd'
 import { createDinosaur } from './dinosaur'
 import type { AnimationName } from './names'
 import { createUnicorn } from './unicorn'
@@ -15,4 +16,5 @@ export const ANIMATIONS: Record<AnimationName, AnimationEntry> = {
   unicorn: { create: createUnicorn, poster: 34 }, // mid-gallop
   dinosaur: { create: createDinosaur, poster: 22 }, // mid-jump over a cactus
   capybara: { create: createCapybara, poster: 60 }, // walking with the orange
+  clawd: { create: createClawd, poster: 54 }, // mid-hop, arms up, with a heart
 }

@@ -4,13 +4,13 @@ A local control app for the **Ulanzi TC002 PixBar**, a 52×16 RGB pixel clock, b
 
 Capybara runs its own MQTT broker. Point the clock at it, and the app can push content to the clock's display: animations, and later text, drawings and data from other services.
 
-> **Status: early proof of concept.** It can stream one of three animations (a unicorn, a dinosaur and a capybara) to the clock, stop it, and clear it again from a small web page. Everything else below under [Roadmap](#roadmap) is planned, not built.
+> **Status: early proof of concept.** It can stream one of four animations (a unicorn, a dinosaur, a capybara and Clawd) to the clock, stop it, and clear it again from a small web page. Everything else below under [Roadmap](#roadmap) is planned, not built.
 
 ## What works today
 
 - **Built-in MQTT broker** written in TypeScript on Bun's TCP sockets. No mosquitto or MQTT library needed; it starts together with the web server.
 - **Web page** at `/` with three buttons:
-  - **Unicorn**, **Dinosaur**, **Capybara**: stream that animation at 8 fps and bring it to the front of the clock. The unicorn gallops back and forth, the dinosaur jumps over cacti, and the capybara wanders across with an orange on its head, stopping halfway to chill.
+  - **Unicorn**, **Dinosaur**, **Capybara**, **Clawd**: stream that animation at 8 fps and bring it to the front of the clock. The unicorn gallops back and forth, the dinosaur jumps over cacti, and the capybara wanders across with an orange on its head, stopping halfway to chill. Clawd, Claude Code's mascot, scuttles across crab-style and stops in the middle to hop and wave while hearts float up.
   - **Stop**: stops streaming. The last frame stays up briefly.
   - **Clear screen**: removes Capybara's app from the clock, so it goes back to its own apps.
 - **Reconnects**: if the clock drops off Wi-Fi and comes back, a running animation is brought to the front again automatically.
